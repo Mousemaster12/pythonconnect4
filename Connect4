@@ -1,0 +1,116 @@
+SIZE = 10
+FIRST = 1
+SECOND = 2
+EMPTY = 0
+
+
+# a funny error msg i found after trying to brute something "TypeError: int() argument must be a string, a bytes-like
+# object or a real number, not 'NoneType'
+
+# Initializing the board
+def init_board():
+    matrix = []
+    for row in range(SIZE):
+        row_to_add = []
+        for col in range(SIZE):
+            row_to_add.append(EMPTY)
+        matrix.append(row_to_add)
+    return matrix
+
+
+# Printing the board
+def print_board(matrix):
+    for row in range(SIZE):
+        line_to_print = ''
+        for col in range(SIZE):
+            line_to_print += str(matrix[row][col]) + ' '
+        print(line_to_print)
+
+
+def playermove(current_player):
+    move = int(input(f"{current_player} turn - \nEnter the column: "))
+    if move == -1:
+        exit()
+    sanitizemove(move, current_player)
+    return move
+
+
+def sanitizemove(move, current_player):
+    move = move - 1
+    if not 9 >= move >= 0:
+        print("Wrong move, try again")
+        playermove(current_player)
+    else:
+        return move
+
+
+def checkmatrix(matrix, move, icon):
+    init_board()
+    for i in range(len(matrix)):
+        if not matrix[i][move] == 0:
+            if not i == 1:
+                matrix[i - 1][move] = icon
+                break
+            else:
+                matrix[i][move] = icon
+                break
+        if i == 9:
+            matrix[i][move] = icon
+            break
+
+
+def switch_player(current_player):
+    if current_player == "First player":
+        return SECOND
+    else:
+        return FIRST
+
+
+def checkwin(matrix):
+    for row in matrix:
+        for i in range(len(row) - 3):
+            if row[i] == row[i + 1] == row[i + 2] == row[i + 3] != EMPTY:
+                return True
+
+    for collumn in range(len(matrix[0])):
+        for i in range(len(matrix) - 3):
+            if matrix[i][collumn] == matrix[i + 1][collumn] == matrix[i + 2][collumn] == matrix[i + 3][
+                collumn] != EMPTY:
+                return True
+
+    return False
+
+
+def main():
+    current_player = "First player"
+    icon = 1
+    matrix = init_board()
+    while not checkwin(matrix, ):
+        move = playermove(current_player) - 1
+        if move == -1:
+            exit()
+        checkmatrix(matrix, move, icon)
+        if switch_player(current_player) == SECOND:
+            current_player = "Second player"
+            icon = SECOND
+        else:
+            current_player = "First player"
+            icon = FIRST
+        print_board(matrix)
+
+    if checkwin(matrix):
+        if icon == FIRST:
+            print("Second player won!")
+        else:
+            print("First player won!")
+
+
+Idea = (
+    "Idea: 4 in a row algorithm key principles: every turn, the algorithm will check what possible winning moves the human has in the next move, then in the next 2 moves. "
+    "the algorithm will evaluate the dangers of each possible win by a a few criteria: number of turns untill it happens, the ability to integrate it wwith other possible wins to create a double-trap, "
+    "and how it changes the bots possible win strategy. if we want to go really haywire with it, we can introduce a neural network utilizing a simple Q-function, since 4 in a row is not a complex game "
+    "a normal Q table is probably all we need. Of course, the disadvantages of Q learning, and AI in general is that it will need to train, however for a game like 4 in a row it shouldnt be very troublesome."
+    "going overboard with Gradient policys isnt needed, and a simple traditional algorithm or a small Q learning algorithm is all we need to create a bot. of course, there is a quite boring option, mapping out"
+    " all the possible positions, and simple avoiding the ones that lead to a loss. idk how much space/time that will take tho")
+main()
+
